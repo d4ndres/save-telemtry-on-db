@@ -6,8 +6,8 @@ services:
     ports:
       - 27017:27017  
     volumes:
-      - ./mongoDB/db:/data/db
-      - ./mongoDB/configdb:/data/configdb
+      - ./mongoDB_${ENTORNO}/db:/data/db
+      - ./mongoDB_${ENTORNO}/configdb:/data/configdb
     environment:
       TZ: "America/Bogota"
       MONGO_INITDB_ROOT_USERNAME: ${USER_ADMIN_MONGO}

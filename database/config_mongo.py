@@ -57,6 +57,6 @@ def add_session_log(session_id: str, log: dict) -> dict:
     session_log = sessions_log_collection.insert_one({
         "session_id": session_id,
         "log": log,
-        "create_at": datetime.datetime.now(),
+        "create_at": datetime.datetime.now().isoformat(timespec='milliseconds'),
     })
     return session_log
