@@ -5,7 +5,7 @@
 Para iniciar los servicios con Docker Compose, ejecuta el siguiente comando en la terminal:
 
 ```sh
-docker-compose up
+docker compose up -d
 ```
 
 ## 2. Crear el archivo `.env`
