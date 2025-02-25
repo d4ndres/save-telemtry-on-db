@@ -1,0 +1,14 @@
+services:
+  mongodb:
+    container_name: ${DB_NAME}
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    restart: always
+    ports:
+      - 27017:27017  
+    volumes:
+      - ./mongoDB/db:/data/db
+      - ./mongoDB/configdb:/data/configdb
+    environment:
+      TZ: "America/Bogota"
+      MONGO_INITDB_ROOT_USERNAME: ${USER_ADMIN_MONGO}
+      MONGO_INITDB_ROOT_PASSWORD: ${PASS_ADMIN_MONGO}
