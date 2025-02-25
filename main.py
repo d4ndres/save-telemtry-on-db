@@ -5,7 +5,7 @@ from beamngpy.sensors import Electrics
 from dotenv import load_dotenv
 import os
 from pymongo import errors
-from database.config_mongo import initialize_mongo, get_or_create_user, new_session, add_session_log
+from database.config_mongo import initialize_mongo, get_or_create_pilot, new_session, add_session_log
 
 load_dotenv()
 
@@ -14,14 +14,14 @@ SESION_USERNAME = os.getenv("SESION_USERNAME")
 SESION_IDENTIFICACION = os.getenv("SESION_IDENTIFICACION")
 SESION_EMPRESA = os.getenv("SESION_EMPRESA")
 
-user_session = None
+pilot_session = None
 current_session = None
 
 def setup_mongo():
-    global user_session
+    global pilot_session
     try:
         initialize_mongo()
-        user_session = get_or_create_user(SESION_IDENTIFICACION, SESION_USERNAME, SESION_EMPRESA)
+        pilot_session = get_or_create_pilot(SESION_IDENTIFICACION, SESION_USERNAME, SESION_EMPRESA)
         
     except errors.ServerSelectionTimeoutError as err:
         print("Error en la conexión con mongo preparando para reconectar...")
@@ -98,7 +98,7 @@ def run_simulation(client, scenario, vehicle):
     vehicle.focus()
 
     # Crear una nueva sesión en la base de datos
-    current_session = new_session(user_session["_id"], {"exercise": session_ejercicio, "vehicle": session_vehiculo})
+    current_session = new_session(pilot_session["_id"], {"exercise": session_ejercicio, "vehicle": session_vehiculo})
 
     max_iter = 300
     try:

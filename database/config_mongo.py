@@ -18,39 +18,39 @@ def initialize_mongo() -> dict[str, Any]:
     mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, maxPoolSize=50)
     db = mongo_client[MONGO_DB]
 
-    collections = ["user", "session", "sessions_log"]
+    collections = ["pilot", "session", "sessions_log"]
     for collection in collections:
         if collection not in db.list_collection_names():
             db.create_collection(collection)
     
     return mongo_client.server_info()
 
-def get_or_create_user(identification: str, username: str = None, company: str = None) -> dict:
-    user_collection = db['user']
-    user = user_collection.find_one({"identification": identification})
-    if not user:
-        user = user_collection.insert_one({
+def get_or_create_pilot(identification: str, username: str = None, company: str = None) -> dict:
+    pilot_collection = db['pilot']
+    pilot = pilot_collection.find_one({"identification": identification})
+    if not pilot:
+        pilot = pilot_collection.insert_one({
             "username": username,
             "identification": identification,
             "company": company
         })
-        print("Usuario registrado en la base de datos.")
+        print("Piloto registrado en la base de datos.")
     else:
-        print("Usuario encontrado en la base de datos.")
-    return user
+        print("Piloto encontrado en la base de datos.")
+    return pilot
 
-def new_session(user_id: str, meta_data: dict) -> dict:
-  session_collection = db['session']
-  user_sessions = list(session_collection.find({"user_id": user_id}))
-  session_number = 1 if not user_sessions else len(user_sessions) + 1
+def new_session(pilot_id: str, meta_data: dict) -> dict:
+    session_collection = db['session']
+    pilot_sessions = list(session_collection.find({"pilot_id": pilot_id}))
+    session_number = 1 if not pilot_sessions else len(pilot_sessions) + 1
 
-  session = session_collection.insert_one({
-    "user_id": user_id,
-    "session_number": session_number,
-    "create_at": datetime.datetime.now(),
-    "meta_data": meta_data,
-  })
-  return session
+    session = session_collection.insert_one({
+        "pilot_id": pilot_id,
+        "session_number": session_number,
+        "create_at": datetime.datetime.now(),
+        "meta_data": meta_data,
+    })
+    return session
 
 def add_session_log(session_id: str, log: dict) -> dict:
     sessions_log_collection = db['sessions_log']
