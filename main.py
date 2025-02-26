@@ -1,4 +1,5 @@
 import time
+from shapely.geometry import Polygon, Point
 import matplotlib.pyplot as plt
 from beamngpy import BeamNGpy, Scenario, Vehicle, StaticObject, angle_to_quat
 from beamngpy.sensors import Electrics
@@ -37,7 +38,7 @@ def setup_client():
         time.sleep(10)
     return client
 
-def run_simulation(client, scenario, vehicle):
+def run_simulation(client, scenario, vehicle, cones):
     """Carga el escenario, ejecuta la simulación y recopila la trayectoria del vehículo."""
     global current_session
     client.scenario.load(scenario)
@@ -58,6 +59,26 @@ def run_simulation(client, scenario, vehicle):
             state = vehicle.sensors["state"]
             sensors_electrics = vehicle.sensors["electrics"]
             
+
+            # Detectar colisiones con los conos
+            bbox = vehicle.get_bbox() 
+            polygon_points = [
+                (bbox['front_bottom_left'][0], bbox['front_bottom_left'][1]),
+                (bbox['front_bottom_right'][0], bbox['front_bottom_right'][1]),
+                (bbox['rear_bottom_right'][0], bbox['rear_bottom_right'][1]),
+                (bbox['rear_bottom_left'][0], bbox['rear_bottom_left'][1])
+            ]
+            vehicle_polygon = Polygon(polygon_points)
+            
+            for cone in cones:
+                cone_pos = (cone.pos[0], cone.pos[1])  # Solo tomamos X, Y
+                cone_point = Point(cone_pos)
+
+                # Verificar si el cono está dentro del polígono
+                if vehicle_polygon.contains(cone_point):
+                    print(f"Colisión detectada con {cone}")
+                    
+
             # Guardar los datos de la sesión
             add_session_log(current_session.inserted_id, {
                 "state": state,
@@ -75,8 +96,8 @@ def run_simulation(client, scenario, vehicle):
 def main():
     setup_mongo()
     client = setup_client()
-    scenario, vehicle = ejercicio_parqueo_conos.create_scenario(client)  # Usar la función de prueba
-    run_simulation(client, scenario, vehicle)
+    scenario, vehicle, cones = ejercicio_parqueo_conos.create_scenario(client)  # Usar la función de prueba
+    run_simulation(client, scenario, vehicle, cones)
 
 if __name__ == "__main__":
     main()

@@ -36,17 +36,19 @@ def create_scenario(client):
 
     # Ordenar las posiciones de los conos por coordenada x y, luego por y
     cone_positions = sorted(cone_positions, key=lambda pos: (pos[0], pos[1]))
-
-    # Agregar conos al escenario usando el modelo "cones"
-    for i, pos in enumerate(cone_positions):
-        cone = StaticObject(
+    cones = [
+        StaticObject(
             name=f"cone_{i}",
             pos=(pos[0], pos[1], 0),  # Agregar coordenada z
             rot_quat=angle_to_quat((0, 0, 55)),
             scale=(1, 1, 1),
             shape="/art/shapes/race/cone.dae",
-        )
+        ) for i, pos in enumerate(cone_positions)
+    ]
+
+    # Agregar conos al escenario usando el modelo "cones"
+    for cone in cones:
         scenario.add_object(cone)
 
     scenario.make(client)
-    return scenario, vehicle
+    return scenario, vehicle, cones
